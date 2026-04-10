@@ -1,23 +1,26 @@
 (() => {
+  // Each entry: { src, url } — set url per image or use a shared default
+  const IMAGE_LINK = 'https://www.instagram.com/commerce__commerce/'; // default link for all images
+
   const images = [
-    'assets/aqin-26245882.jpg',
-    'assets/barnabas-davoti-31615494-9800961.jpg',
-    'assets/beat-bieri-2159265755-36568662.jpg',
-    'assets/dmitry-kharitonov-911287485-20868515.jpg',
-    'assets/enrique-hidalgo-1230661389-34330428.jpg',
-    'assets/filiberto-giglio-993682392-28962104.jpg',
-    'assets/googledeepmind-18069860.jpg',
-    'assets/googledeepmind-25626506.jpg',
-    'assets/googledeepmind-25626511.jpg',
-    'assets/lawlesscapture-6395524.jpg',
-    'assets/lonnyphotography-34483851.jpg',
-    'assets/macro-photography-12412301-12514380.jpg',
-    'assets/macro-photography-12412301-12514383.jpg',
-    'assets/macro-photography-12412301-12561245.jpg',
-    'assets/mike-van-schoonderwalt-1884800-5504365.jpg',
-    'assets/nguyen-92374660-9144702.jpg',
-    'assets/nikola-tomasic-58494762-33332014.jpg',
-    'assets/nils-rotura-2157795908-35101219.jpg',
+    { src: 'assets/aqin-26245882.jpg' },
+    { src: 'assets/barnabas-davoti-31615494-9800961.jpg' },
+    { src: 'assets/beat-bieri-2159265755-36568662.jpg' },
+    { src: 'assets/dmitry-kharitonov-911287485-20868515.jpg' },
+    { src: 'assets/enrique-hidalgo-1230661389-34330428.jpg' },
+    { src: 'assets/filiberto-giglio-993682392-28962104.jpg' },
+    { src: 'assets/googledeepmind-18069860.jpg' },
+    { src: 'assets/googledeepmind-25626506.jpg' },
+    { src: 'assets/googledeepmind-25626511.jpg' },
+    { src: 'assets/lawlesscapture-6395524.jpg' },
+    { src: 'assets/lonnyphotography-34483851.jpg' },
+    { src: 'assets/macro-photography-12412301-12514380.jpg' },
+    { src: 'assets/macro-photography-12412301-12514383.jpg' },
+    { src: 'assets/macro-photography-12412301-12561245.jpg' },
+    { src: 'assets/mike-van-schoonderwalt-1884800-5504365.jpg' },
+    { src: 'assets/nguyen-92374660-9144702.jpg' },
+    { src: 'assets/nikola-tomasic-58494762-33332014.jpg' },
+    { src: 'assets/nils-rotura-2157795908-35101219.jpg' },
   ];
   const IMAGE_COUNT = images.length;
   const COOLDOWN_MS = 10;          // min time between transitions
@@ -29,19 +32,28 @@
   const counterTotal = document.querySelector('.gallery__total');
   const counter = document.querySelector('.gallery__counter');
   const scrollHint = document.querySelector('.scroll-hint');
+  const cursorLabel = document.querySelector('.cursor-label');
 
   counterTotal.textContent = String(IMAGE_COUNT).padStart(2, '0');
 
-  // ── Create image elements ──
-  const imageEls = images.map((src, i) => {
+  // ── Create image elements wrapped in links ──
+  const imageEls = images.map((entry, i) => {
+    const link = document.createElement('a');
+    link.className = 'gallery__link';
+    link.href = entry.url || IMAGE_LINK;
+    link.target = '_blank';
+    link.rel = 'noopener noreferrer';
+
     const img = document.createElement('img');
     img.className = 'gallery__image';
-    img.src = src;
+    img.src = entry.src;
     img.alt = `Image ${i + 1}`;
     img.draggable = false;
-    if (i === 0) img.classList.add('is-active');
-    track.appendChild(img);
-    return img;
+
+    link.appendChild(img);
+    if (i === 0) link.classList.add('is-active');
+    track.appendChild(link);
+    return link;
   });
 
   // ── State ──
@@ -183,6 +195,44 @@
       goTo((currentIndex - 1 + IMAGE_COUNT) % IMAGE_COUNT);
     }
   }
+
+  // ── Cursor label follows mouse with elastic effect ──
+  let mouseX = 0, mouseY = 0;
+  let labelX = 0, labelY = 0;
+  let labelVisible = false;
+  let rafId = null;
+
+  function updateLabelPosition() {
+    // Elastic lerp — label trails behind the mouse
+    labelX += (mouseX - labelX) * 0.12;
+    labelY += (mouseY - labelY) * 0.12;
+    gsap.set(cursorLabel, { left: labelX, top: labelY });
+
+    if (labelVisible) {
+      rafId = requestAnimationFrame(updateLabelPosition);
+    }
+  }
+
+  track.addEventListener('mouseenter', (e) => {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+    labelX = mouseX;
+    labelY = mouseY;
+    gsap.to(cursorLabel, { opacity: 1, duration: 0.25 });
+    labelVisible = true;
+    rafId = requestAnimationFrame(updateLabelPosition);
+  });
+
+  track.addEventListener('mouseleave', () => {
+    gsap.to(cursorLabel, { opacity: 0, duration: 0.25 });
+    labelVisible = false;
+    if (rafId) cancelAnimationFrame(rafId);
+  });
+
+  track.addEventListener('mousemove', (e) => {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+  });
 
   // ── Bind events ──
   window.addEventListener('wheel', onWheel, { passive: false });

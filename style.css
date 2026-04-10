@@ -16,6 +16,7 @@ body {
 
 /* Header */
 .site-header {
+  width: 100%;
   position: fixed;
   top: 2rem;
   left: 50%;
@@ -50,14 +51,42 @@ body {
   height: 65vmin;
 }
 
-.gallery__image {
+.gallery__link {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  display: block;
   will-change: transform, opacity, clip-path;
   clip-path: inset(0 0 0 0);
+  pointer-events: none;
+}
+
+.gallery__link.is-active {
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+/* Cursor label */
+.cursor-label {
+  position: fixed;
+  pointer-events: none;
+  z-index: 100;
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #fff;
+  mix-blend-mode: difference;
+  opacity: 0;
+  transform: translate(-50%, -50%);
+  transition: opacity 0.25s ease;
+}
+
+.gallery__image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 /* Counter */
