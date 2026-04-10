@@ -32,29 +32,30 @@
 
   // ── State ──
   let currentIndex = 0;
-  let isAnimating = false;
   let lastScrollTime = 0;
   let accumulatedDelta = 0;
   let hintVisible = true;
 
-  // ── Set initial image visible ──
-  gsap.set(imageEls[0], { opacity: 1 });
+  // ── Set initial visibility: all hidden except the first ──
+  imageEls.forEach((img, i) => {
+    gsap.set(img, { opacity: i === 0 ? 1 : 0 });
+  });
 
   // ── Transition to a given index ──
   function goTo(nextIndex) {
-    if (nextIndex === currentIndex || isAnimating) return;
-    isAnimating = true;
+    if (nextIndex === currentIndex) return;
+
+    // Kill any in-progress animations and reset all images
+    imageEls.forEach((img, i) => {
+      gsap.killTweensOf(img);
+      if (i !== currentIndex && i !== nextIndex) {
+        img.classList.remove('is-active');
+        gsap.set(img, { opacity: 0, scale: 1, clipPath: 'inset(0 0 0 0)' });
+      }
+    });
 
     const outgoing = imageEls[currentIndex];
     const incoming = imageEls[nextIndex];
-    const tl = gsap.timeline({
-      onComplete() {
-        outgoing.classList.remove('is-active');
-        isAnimating = false;
-        currentIndex = nextIndex;
-        counterCurrent.textContent = String(currentIndex + 1).padStart(2, '0');
-      }
-    });
 
     // Incoming: starts as a tiny point in the center and expands
     gsap.set(incoming, {
@@ -64,19 +65,27 @@
     });
     incoming.classList.add('is-active');
 
-    tl.to(incoming, {
+    gsap.to(incoming, {
       clipPath: 'inset(0% 0% 0% 0%)',
       scale: 1,
       duration: 0.15,
       ease: 'power1.out',
-    }, 0);
+      onComplete() {
+        outgoing.classList.remove('is-active');
+        gsap.set(outgoing, { opacity: 1, scale: 1, clipPath: 'inset(0 0 0 0)' });
+      }
+    });
 
-    // Outgoing: instant fade as new image covers it
-    tl.to(outgoing, {
-      opacity: 0,
-      duration: 0.1,
-      ease: 'none',
-    }, 0.05);
+    // Outgoing: ensure fully visible, then enlarge to fill the page
+    gsap.set(outgoing, { opacity: 1 });
+    gsap.to(outgoing, {
+      scale: 2.5,
+      duration: 0.15,
+      ease: 'power1.out',
+    });
+
+    currentIndex = nextIndex;
+    counterCurrent.textContent = String(currentIndex + 1).padStart(2, '0');
   }
 
   // ── Wheel handler ──
@@ -88,8 +97,6 @@
       hintVisible = false;
       scrollHint.classList.add('is-hidden');
     }
-
-    if (isAnimating) return;
 
     const now = Date.now();
     if (now - lastScrollTime < COOLDOWN_MS) return;
@@ -115,7 +122,7 @@
 
   function onTouchEnd(e) {
     const deltaY = touchStartY - e.changedTouches[0].clientY;
-    if (Math.abs(deltaY) < 30 || isAnimating) return;
+    if (Math.abs(deltaY) < 30) return;
 
     if (hintVisible) {
       hintVisible = false;
@@ -135,14 +142,12 @@
   function onKeyDown(e) {
     if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
       e.preventDefault();
-      if (isAnimating) return;
       const now = Date.now();
       if (now - lastScrollTime < COOLDOWN_MS) return;
       lastScrollTime = now;
       goTo((currentIndex + 1) % IMAGE_COUNT);
     } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
       e.preventDefault();
-      if (isAnimating) return;
       const now = Date.now();
       if (now - lastScrollTime < COOLDOWN_MS) return;
       lastScrollTime = now;
