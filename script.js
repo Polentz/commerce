@@ -45,23 +45,32 @@
   function goTo(nextIndex) {
     if (nextIndex === currentIndex) return;
 
-    // Kill any in-progress animations and reset all images
+    // Kill all tweens; keep old images visible as backdrop, preserve their scale
     imageEls.forEach((img, i) => {
       gsap.killTweensOf(img);
       if (i !== currentIndex && i !== nextIndex) {
         img.classList.remove('is-active');
-        gsap.set(img, { opacity: 0, scale: 1, clipPath: 'inset(0 0 0 0)' });
+        gsap.set(img, { opacity: 1, clipPath: 'inset(0 0 0 0)', zIndex: 0 });
       }
     });
 
     const outgoing = imageEls[currentIndex];
     const incoming = imageEls[nextIndex];
 
-    // Incoming: starts as a tiny point in the center and expands
+    // Outgoing: ensure fully visible, layer above backdrop, then enlarge
+    gsap.set(outgoing, { opacity: 1, zIndex: 1 });
+    gsap.to(outgoing, {
+      scale: 2,
+      duration: 0.15,
+      ease: 'power1.out',
+    });
+
+    // Incoming: highest layer, starts as tiny point in center and expands
     gsap.set(incoming, {
       opacity: 1,
       scale: 0,
       clipPath: 'inset(50% 50% 50% 50%)',
+      zIndex: 2,
     });
     incoming.classList.add('is-active');
 
@@ -72,16 +81,8 @@
       ease: 'power1.out',
       onComplete() {
         outgoing.classList.remove('is-active');
-        gsap.set(outgoing, { opacity: 1, scale: 1, clipPath: 'inset(0 0 0 0)' });
+        gsap.set(outgoing, { opacity: 1, clipPath: 'inset(0 0 0 0)', zIndex: 0 });
       }
-    });
-
-    // Outgoing: ensure fully visible, then enlarge to fill the page
-    gsap.set(outgoing, { opacity: 1 });
-    gsap.to(outgoing, {
-      scale: 2.5,
-      duration: 0.15,
-      ease: 'power1.out',
     });
 
     currentIndex = nextIndex;
