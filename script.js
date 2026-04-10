@@ -138,7 +138,7 @@
     gsap.set(outgoing, { opacity: 1, zIndex: 1 });
     activeTweenOut = gsap.to(outgoing, {
       scale: 2,
-      duration: 0.15,
+      duration: 0.3,
       ease: 'power1.out',
     });
 
@@ -154,7 +154,7 @@
     activeTweenIn = gsap.to(incoming, {
       clipPath: 'inset(0% 0% 0% 0%)',
       scale: 1,
-      duration: 0.15,
+      duration: 0.3,
       ease: 'power1.out',
       onComplete() {
         outgoing.classList.remove('is-active');
