@@ -27,6 +27,7 @@
   const track = document.querySelector('.gallery__track');
   const counterCurrent = document.querySelector('.gallery__current');
   const counterTotal = document.querySelector('.gallery__total');
+  const counter = document.querySelector('.gallery__counter');
   const scrollHint = document.querySelector('.scroll-hint');
 
   counterTotal.textContent = String(IMAGE_COUNT).padStart(2, '0');
@@ -46,6 +47,7 @@
   // ── State ──
   let currentIndex = 0;
   let prevIndex = -1;
+  let counterShown = false;
   let lastScrollTime = 0;
   let accumulatedDelta = 0;
   let hintVisible = true;
@@ -58,6 +60,12 @@
   // ── Transition to a given index ──
   function goTo(nextIndex) {
     if (nextIndex === currentIndex) return;
+
+    // Show counter on first transition
+    if (!counterShown) {
+      counterShown = true;
+      counter.classList.add('is-visible');
+    }
 
     // Kill all tweens; only keep the previous backdrop visible, hide the rest
     imageEls.forEach((img, i) => {
@@ -114,10 +122,10 @@
     e.preventDefault();
 
     // Hide hint on first scroll
-    if (hintVisible) {
-      hintVisible = false;
-      scrollHint.classList.add('is-hidden');
-    }
+    // if (hintVisible) {
+    //   hintVisible = false;
+    //   scrollHint.classList.add('is-hidden');
+    // }
 
     const now = Date.now();
     if (now - lastScrollTime < COOLDOWN_MS) return;
@@ -145,10 +153,10 @@
     const deltaY = touchStartY - e.changedTouches[0].clientY;
     if (Math.abs(deltaY) < 30) return;
 
-    if (hintVisible) {
-      hintVisible = false;
-      scrollHint.classList.add('is-hidden');
-    }
+    // if (hintVisible) {
+    //   hintVisible = false;
+    //   scrollHint.classList.add('is-hidden');
+    // }
 
     const now = Date.now();
     if (now - lastScrollTime < COOLDOWN_MS) return;
