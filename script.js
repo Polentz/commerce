@@ -23,8 +23,8 @@
     { src: 'assets/nils-rotura-2157795908-35101219.jpg' },
   ];
   const IMAGE_COUNT = images.length;
-  const COOLDOWN_MS = 10;          // min time between transitions
-  const SCROLL_THRESHOLD = 1;       // deltaY needed to trigger a change
+  const COOLDOWN_MS = 250;          // min time between transitions
+  const SCROLL_THRESHOLD = 40;       // deltaY needed to trigger a change
 
   // ── DOM references ──
   const track = document.querySelector('.gallery__track');
@@ -81,7 +81,7 @@
         gsap.set(img, { opacity: 1, scale: 1, clipPath: 'inset(0 0 0 0)', zIndex: 2 });
       } else if (i === prevIndex) {
         img.classList.remove('is-active');
-        gsap.set(img, { opacity: 1, clipPath: 'inset(0 0 0 0)', zIndex: 0 });
+        gsap.set(img, { opacity: 1, scale: 2, clipPath: 'inset(0 0 0 0)', zIndex: 0 });
       } else {
         img.classList.remove('is-active');
         gsap.set(img, { opacity: 0, scale: 1, clipPath: 'inset(0 0 0 0)', zIndex: 0 });
@@ -124,7 +124,7 @@
         gsap.killTweensOf(img);
         img.classList.remove('is-active');
         if (i === prevIndex) {
-          gsap.set(img, { opacity: 1, clipPath: 'inset(0 0 0 0)', zIndex: 0 });
+          gsap.set(img, { opacity: 1, scale: 2, clipPath: 'inset(0 0 0 0)', zIndex: 0 });
         } else {
           gsap.set(img, { opacity: 0, scale: 1, clipPath: 'inset(0 0 0 0)', zIndex: 0 });
         }
@@ -138,7 +138,7 @@
     gsap.set(outgoing, { opacity: 1, zIndex: 1 });
     activeTweenOut = gsap.to(outgoing, {
       scale: 2,
-      duration: 0.3,
+      duration: 0.15,
       ease: 'power1.out',
     });
 
@@ -158,7 +158,7 @@
       ease: 'power1.out',
       onComplete() {
         outgoing.classList.remove('is-active');
-        gsap.set(outgoing, { opacity: 1, clipPath: 'inset(0 0 0 0)', zIndex: 0 });
+        gsap.set(outgoing, { opacity: 1, scale: 2, clipPath: 'inset(0 0 0 0)', zIndex: 0 });
         activeTweenOut = null;
         activeTweenIn = null;
       }
