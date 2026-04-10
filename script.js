@@ -64,6 +64,8 @@
   let accumulatedDelta = 0;
   let hintVisible = true;
   let settleTimer = null;
+  let activeTweenOut = null;
+  let activeTweenIn = null;
 
   // ── Set initial visibility: all hidden except the first ──
   imageEls.forEach((img, i) => {
@@ -87,6 +89,18 @@
     });
   }
 
+  // ── Force-complete any running animation before starting a new one ──
+  function completeActiveTweens() {
+    if (activeTweenOut) {
+      activeTweenOut.progress(1);
+      activeTweenOut = null;
+    }
+    if (activeTweenIn) {
+      activeTweenIn.progress(1);
+      activeTweenIn = null;
+    }
+  }
+
   // ── Transition to a given index ──
   function goTo(nextIndex) {
     if (nextIndex === currentIndex) return;
@@ -101,10 +115,13 @@
     clearTimeout(settleTimer);
     settleTimer = setTimeout(settle, 200);
 
-    // Kill all tweens; only keep the previous backdrop visible, hide the rest
+    // Force-complete the previous animation so it reaches its final state
+    completeActiveTweens();
+
+    // Clean up all non-participating images
     imageEls.forEach((img, i) => {
-      gsap.killTweensOf(img);
       if (i !== currentIndex && i !== nextIndex) {
+        gsap.killTweensOf(img);
         img.classList.remove('is-active');
         if (i === prevIndex) {
           gsap.set(img, { opacity: 1, clipPath: 'inset(0 0 0 0)', zIndex: 0 });
@@ -119,7 +136,7 @@
 
     // Outgoing: ensure fully visible, layer above backdrop, then enlarge
     gsap.set(outgoing, { opacity: 1, zIndex: 1 });
-    gsap.to(outgoing, {
+    activeTweenOut = gsap.to(outgoing, {
       scale: 2,
       duration: 0.15,
       ease: 'power1.out',
@@ -134,7 +151,7 @@
     });
     incoming.classList.add('is-active');
 
-    gsap.to(incoming, {
+    activeTweenIn = gsap.to(incoming, {
       clipPath: 'inset(0% 0% 0% 0%)',
       scale: 1,
       duration: 0.15,
@@ -142,6 +159,8 @@
       onComplete() {
         outgoing.classList.remove('is-active');
         gsap.set(outgoing, { opacity: 1, clipPath: 'inset(0 0 0 0)', zIndex: 0 });
+        activeTweenOut = null;
+        activeTweenIn = null;
       }
     });
 
