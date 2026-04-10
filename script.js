@@ -1,14 +1,27 @@
 (() => {
-  const IMAGE_COUNT = 20;
+  const images = [
+    'assets/aqin-26245882.jpg',
+    'assets/barnabas-davoti-31615494-9800961.jpg',
+    'assets/beat-bieri-2159265755-36568662.jpg',
+    'assets/dmitry-kharitonov-911287485-20868515.jpg',
+    'assets/enrique-hidalgo-1230661389-34330428.jpg',
+    'assets/filiberto-giglio-993682392-28962104.jpg',
+    'assets/googledeepmind-18069860.jpg',
+    'assets/googledeepmind-25626506.jpg',
+    'assets/googledeepmind-25626511.jpg',
+    'assets/lawlesscapture-6395524.jpg',
+    'assets/lonnyphotography-34483851.jpg',
+    'assets/macro-photography-12412301-12514380.jpg',
+    'assets/macro-photography-12412301-12514383.jpg',
+    'assets/macro-photography-12412301-12561245.jpg',
+    'assets/mike-van-schoonderwalt-1884800-5504365.jpg',
+    'assets/nguyen-92374660-9144702.jpg',
+    'assets/nikola-tomasic-58494762-33332014.jpg',
+    'assets/nils-rotura-2157795908-35101219.jpg',
+  ];
+  const IMAGE_COUNT = images.length;
   const COOLDOWN_MS = 10;          // min time between transitions
   const SCROLL_THRESHOLD = 1;       // deltaY needed to trigger a change
-
-  // ── Generate placeholder images (replace with your own paths) ──
-  const images = Array.from({ length: IMAGE_COUNT }, (_, i) => {
-    const hue = (i * 360) / IMAGE_COUNT;
-    // Using picsum for demo; swap these URLs for your real images
-    return `https://picsum.photos/seed/commerce${i + 1}/800/800`;
-  });
 
   // ── DOM references ──
   const track = document.querySelector('.gallery__track');
