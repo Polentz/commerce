@@ -32,6 +32,7 @@
 
   // ── State ──
   let currentIndex = 0;
+  let prevIndex = -1;
   let lastScrollTime = 0;
   let accumulatedDelta = 0;
   let hintVisible = true;
@@ -45,12 +46,17 @@
   function goTo(nextIndex) {
     if (nextIndex === currentIndex) return;
 
-    // Kill all tweens; keep old images visible as backdrop, preserve their scale
+    // Kill all tweens; only keep the previous backdrop visible, hide the rest
     imageEls.forEach((img, i) => {
       gsap.killTweensOf(img);
       if (i !== currentIndex && i !== nextIndex) {
         img.classList.remove('is-active');
-        gsap.set(img, { opacity: 1, clipPath: 'inset(0 0 0 0)', zIndex: 0 });
+        if (i === prevIndex) {
+          // Keep previous backdrop visible behind everything
+          gsap.set(img, { opacity: 1, clipPath: 'inset(0 0 0 0)', zIndex: 0 });
+        } else {
+          gsap.set(img, { opacity: 0, scale: 1, clipPath: 'inset(0 0 0 0)', zIndex: 0 });
+        }
       }
     });
 
@@ -85,6 +91,7 @@
       }
     });
 
+    prevIndex = currentIndex;
     currentIndex = nextIndex;
     counterCurrent.textContent = String(currentIndex + 1).padStart(2, '0');
   }
