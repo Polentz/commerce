@@ -63,11 +63,29 @@
   let lastScrollTime = 0;
   let accumulatedDelta = 0;
   let hintVisible = true;
+  let settleTimer = null;
 
   // ── Set initial visibility: all hidden except the first ──
   imageEls.forEach((img, i) => {
     gsap.set(img, { opacity: i === 0 ? 1 : 0 });
   });
+
+  // ── Snap everything to a clean final state ──
+  function settle() {
+    imageEls.forEach((img, i) => {
+      gsap.killTweensOf(img);
+      if (i === currentIndex) {
+        img.classList.add('is-active');
+        gsap.set(img, { opacity: 1, scale: 1, clipPath: 'inset(0 0 0 0)', zIndex: 2 });
+      } else if (i === prevIndex) {
+        img.classList.remove('is-active');
+        gsap.set(img, { opacity: 1, clipPath: 'inset(0 0 0 0)', zIndex: 0 });
+      } else {
+        img.classList.remove('is-active');
+        gsap.set(img, { opacity: 0, scale: 1, clipPath: 'inset(0 0 0 0)', zIndex: 0 });
+      }
+    });
+  }
 
   // ── Transition to a given index ──
   function goTo(nextIndex) {
@@ -79,13 +97,16 @@
       counter.classList.add('is-visible');
     }
 
+    // Cancel pending settle, schedule a new one
+    clearTimeout(settleTimer);
+    settleTimer = setTimeout(settle, 200);
+
     // Kill all tweens; only keep the previous backdrop visible, hide the rest
     imageEls.forEach((img, i) => {
       gsap.killTweensOf(img);
       if (i !== currentIndex && i !== nextIndex) {
         img.classList.remove('is-active');
         if (i === prevIndex) {
-          // Keep previous backdrop visible behind everything
           gsap.set(img, { opacity: 1, clipPath: 'inset(0 0 0 0)', zIndex: 0 });
         } else {
           gsap.set(img, { opacity: 0, scale: 1, clipPath: 'inset(0 0 0 0)', zIndex: 0 });
