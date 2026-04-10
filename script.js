@@ -180,7 +180,13 @@
   let touchAccDelta = 0;
   const TOUCH_THRESHOLD = 15;
 
+  let cursorLabelShown = false;
+
   function onTouchStart(e) {
+    if (!cursorLabelShown) {
+      cursorLabelShown = true;
+      cursorLabel.classList.add('is-visible');
+    }
     touchLastY = e.touches[0].clientY;
     touchAccDelta = 0;
   }
