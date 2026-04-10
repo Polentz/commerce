@@ -3,24 +3,39 @@
   const IMAGE_LINK = 'https://www.instagram.com/commerce__commerce/'; // default link for all images
 
   const images = [
-    { src: 'assets/aqin-26245882.jpg' },
-    { src: 'assets/barnabas-davoti-31615494-9800961.jpg' },
-    { src: 'assets/beat-bieri-2159265755-36568662.jpg' },
-    { src: 'assets/dmitry-kharitonov-911287485-20868515.jpg' },
-    { src: 'assets/enrique-hidalgo-1230661389-34330428.jpg' },
-    { src: 'assets/filiberto-giglio-993682392-28962104.jpg' },
-    { src: 'assets/googledeepmind-18069860.jpg' },
-    { src: 'assets/googledeepmind-25626506.jpg' },
-    { src: 'assets/googledeepmind-25626511.jpg' },
-    { src: 'assets/lawlesscapture-6395524.jpg' },
-    { src: 'assets/lonnyphotography-34483851.jpg' },
-    { src: 'assets/macro-photography-12412301-12514380.jpg' },
-    { src: 'assets/macro-photography-12412301-12514383.jpg' },
-    { src: 'assets/macro-photography-12412301-12561245.jpg' },
-    { src: 'assets/mike-van-schoonderwalt-1884800-5504365.jpg' },
-    { src: 'assets/nguyen-92374660-9144702.jpg' },
-    { src: 'assets/nikola-tomasic-58494762-33332014.jpg' },
-    { src: 'assets/nils-rotura-2157795908-35101219.jpg' },
+    { src: 'assets/commerce-1.jpg' },
+    { src: 'assets/commerce-2.jpg' },
+    { src: 'assets/commerce-3.jpg' },
+    { src: 'assets/commerce-4.jpg' },
+    { src: 'assets/commerce-5.jpg' },
+    { src: 'assets/commerce-6.jpg' },
+    { src: 'assets/commerce-7.jpg' },
+    { src: 'assets/commerce-8.jpg' },
+    { src: 'assets/commerce-9.jpg' },
+    { src: 'assets/commerce-10.jpg' },
+    { src: 'assets/commerce-11.jpg' },
+    { src: 'assets/commerce-12.jpg' },
+    { src: 'assets/commerce-13.jpg' },
+    { src: 'assets/commerce-14.jpg' },
+    { src: 'assets/commerce-15.jpg' },
+    { src: 'assets/commerce-16.jpg' },
+    { src: 'assets/commerce-17.jpg' },
+    { src: 'assets/commerce-18.jpg' },
+    { src: 'assets/commerce-19.jpg' },
+    { src: 'assets/commerce-20.jpg' },
+    { src: 'assets/commerce-21.jpg' },
+    { src: 'assets/commerce-22.jpg' },
+    { src: 'assets/commerce-23.jpg' },
+    { src: 'assets/commerce-24.jpg' },
+    { src: 'assets/commerce-25.jpg' },
+    { src: 'assets/commerce-26.jpg' },
+    { src: 'assets/commerce-27.jpg' },
+    { src: 'assets/commerce-28.jpg' },
+    { src: 'assets/commerce-29.jpg' },
+    { src: 'assets/commerce-30.jpg' },
+    { src: 'assets/commerce-31.jpg' },
+    { src: 'assets/commerce-32.jpg' },
+    { src: 'assets/commerce-33.jpg' },
   ];
   const IMAGE_COUNT = images.length;
   const COOLDOWN_MS = 200;          // min time between transitions
@@ -282,6 +297,31 @@
   track.addEventListener('mousemove', (e) => {
     mouseX = e.clientX;
     mouseY = e.clientY;
+  });
+
+  // ── Reset to initial state when clicking outside the gallery ──
+  function resetToInitial() {
+    completeActiveTweens();
+    clearTimeout(settleTimer);
+
+    imageEls.forEach((img) => {
+      gsap.killTweensOf(img);
+      img.classList.remove('is-active');
+      gsap.set(img, { opacity: 0, scale: 1, clipPath: 'inset(0 0 0 0)', zIndex: 0, x: 0 });
+    });
+
+    imageEls[0].classList.add('is-active');
+    gsap.set(imageEls[0], { opacity: 1, scale: 1, zIndex: 2 });
+
+    currentIndex = 0;
+    prevIndex = -1;
+    counterCurrent.textContent = '01';
+  }
+
+  document.addEventListener('click', (e) => {
+    if (!track.contains(e.target)) {
+      resetToInitial();
+    }
   });
 
   // ── Bind events ──

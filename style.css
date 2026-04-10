@@ -48,7 +48,7 @@ body {
 .gallery__track {
   position: relative;
   width: 65vmin;
-  height: 65vmin;
+  height: 80vmin;
 }
 
 .gallery__link {
