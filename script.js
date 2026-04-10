@@ -23,8 +23,8 @@
     { src: 'assets/nils-rotura-2157795908-35101219.jpg' },
   ];
   const IMAGE_COUNT = images.length;
-  const COOLDOWN_MS = 250;          // min time between transitions
-  const SCROLL_THRESHOLD = 40;       // deltaY needed to trigger a change
+  const COOLDOWN_MS = 200;          // min time between transitions
+  const SCROLL_THRESHOLD = 20;       // deltaY needed to trigger a change
 
   // ── DOM references ──
   const track = document.querySelector('.gallery__track');
