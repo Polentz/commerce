@@ -175,27 +175,31 @@
     goTo(nextIndex);
   }
 
-  // ── Touch support ──
-  let touchStartY = 0;
+  // ── Touch support (fires continuously while swiping) ──
+  let touchLastY = 0;
+  let touchAccDelta = 0;
+  const TOUCH_THRESHOLD = 15;
 
   function onTouchStart(e) {
-    touchStartY = e.touches[0].clientY;
+    touchLastY = e.touches[0].clientY;
+    touchAccDelta = 0;
   }
 
-  function onTouchEnd(e) {
-    const deltaY = touchStartY - e.changedTouches[0].clientY;
-    if (Math.abs(deltaY) < 30) return;
+  function onTouchMove(e) {
+    e.preventDefault();
+    const y = e.touches[0].clientY;
+    touchAccDelta += touchLastY - y;
+    touchLastY = y;
 
-    // if (hintVisible) {
-    //   hintVisible = false;
-    //   scrollHint.classList.add('is-hidden');
-    // }
+    if (Math.abs(touchAccDelta) < TOUCH_THRESHOLD) return;
 
     const now = Date.now();
     if (now - lastScrollTime < COOLDOWN_MS) return;
     lastScrollTime = now;
 
-    const direction = deltaY > 0 ? 1 : -1;
+    const direction = touchAccDelta > 0 ? 1 : -1;
+    touchAccDelta = 0;
+
     const nextIndex = (currentIndex + direction + IMAGE_COUNT) % IMAGE_COUNT;
     goTo(nextIndex);
   }
@@ -258,6 +262,6 @@
   // ── Bind events ──
   window.addEventListener('wheel', onWheel, { passive: false });
   window.addEventListener('touchstart', onTouchStart, { passive: true });
-  window.addEventListener('touchend', onTouchEnd, { passive: true });
+  window.addEventListener('touchmove', onTouchMove, { passive: false });
   window.addEventListener('keydown', onKeyDown);
 })();
